@@ -38,8 +38,8 @@ social:
   email: a0903507057@gmail.com.com # change to your email address
   links:
     # The first element serves as the copyright owner's link
-    - https://twitter.com/username # change to your twitter homepage
     - https://github.com/Youjia0706 # change to your github homepage
+    - https://twitter.com/username # change to your twitter homepage
     # Uncomment below to add more social links
     - https://www.facebook.com/username
     - https://www.linkedin.com/in/username
@@ -136,7 +136,7 @@ assets:
     env: # [development | production]
 
 pwa:
-  enabled: true # the option for PWA feature (installable)
+  enabled: false # the option for PWA feature (installable)
   cache:
     enabled: true # the option for PWA offline cache
     # Paths defined here will be excluded from the PWA cache.
