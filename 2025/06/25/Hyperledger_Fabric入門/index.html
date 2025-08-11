@@ -1,0 +1,354 @@
+<!DOCTYPE html><html lang="zh-TW" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0,viewport-fit=cover"><title>Hyperledger Fabric 入門 | J03Y's blog</title><meta name="author" content="J03Y"><meta name="copyright" content="J03Y"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="從環境建置到智能合約部署，操作 Hyperledger Fabric 官方 Sample 範例，並紀錄常用指令">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Hyperledger Fabric 入門">
+<meta property="og:url" content="http://youjia0706.github.io/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/index.html">
+<meta property="og:site_name" content="J03Y&#39;s blog">
+<meta property="og:description" content="從環境建置到智能合約部署，操作 Hyperledger Fabric 官方 Sample 範例，並紀錄常用指令">
+<meta property="og:locale" content="zh_TW">
+<meta property="og:image" content="http://youjia0706.github.io/img/joey.png">
+<meta property="article:published_time" content="2025-06-25T08:56:49.000Z">
+<meta property="article:modified_time" content="2025-08-11T01:41:29.759Z">
+<meta property="article:author" content="J03Y">
+<meta property="article:tag" content="區塊鏈">
+<meta property="article:tag" content="Hyperledger Fabric">
+<meta property="article:tag" content="技術筆記">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="http://youjia0706.github.io/img/joey.png"><script type="application/ld+json">{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Hyperledger Fabric 入門",
+  "url": "http://youjia0706.github.io/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/",
+  "image": "http://youjia0706.github.io/img/joey.png",
+  "datePublished": "2025-06-25T08:56:49.000Z",
+  "dateModified": "2025-08-11T01:41:29.759Z",
+  "author": [
+    {
+      "@type": "Person",
+      "name": "J03Y",
+      "url": "http://Youjia0706.github.io"
+    }
+  ]
+}</script><link rel="shortcut icon" href="/img/favicon.ico"><link rel="canonical" href="http://youjia0706.github.io/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/index.html"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="preconnect" href="//busuanzi.ibruce.info"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css"><script>
+    (() => {
+      
+    const saveToLocal = {
+      set: (key, value, ttl) => {
+        if (!ttl) return
+        const expiry = Date.now() + ttl * 86400000
+        localStorage.setItem(key, JSON.stringify({ value, expiry }))
+      },
+      get: key => {
+        const itemStr = localStorage.getItem(key)
+        if (!itemStr) return undefined
+        const { value, expiry } = JSON.parse(itemStr)
+        if (Date.now() > expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return value
+      }
+    }
+
+    window.btf = {
+      saveToLocal,
+      getScript: (url, attr = {}) => new Promise((resolve, reject) => {
+        const script = document.createElement('script')
+        script.src = url
+        script.async = true
+        Object.entries(attr).forEach(([key, val]) => script.setAttribute(key, val))
+        script.onload = script.onreadystatechange = () => {
+          if (!script.readyState || /loaded|complete/.test(script.readyState)) resolve()
+        }
+        script.onerror = reject
+        document.head.appendChild(script)
+      }),
+      getCSS: (url, id) => new Promise((resolve, reject) => {
+        const link = document.createElement('link')
+        link.rel = 'stylesheet'
+        link.href = url
+        if (id) link.id = id
+        link.onload = link.onreadystatechange = () => {
+          if (!link.readyState || /loaded|complete/.test(link.readyState)) resolve()
+        }
+        link.onerror = reject
+        document.head.appendChild(link)
+      }),
+      addGlobalFn: (key, fn, name = false, parent = window) => {
+        if (!false && key.startsWith('pjax')) return
+        const globalFn = parent.globalFn || {}
+        globalFn[key] = globalFn[key] || {}
+        globalFn[key][name || Object.keys(globalFn[key]).length] = fn
+        parent.globalFn = globalFn
+      }
+    }
+  
+      
+      const activateDarkMode = () => {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      const activateLightMode = () => {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+
+      btf.activateDarkMode = activateDarkMode
+      btf.activateLightMode = activateLightMode
+
+      const theme = saveToLocal.get('theme')
+    
+          theme === 'dark' ? activateDarkMode() : theme === 'light' ? activateLightMode() : null
+        
+      
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        document.documentElement.classList.toggle('hide-aside', asideStatus === 'hide')
+      }
+    
+      
+    const detectApple = () => {
+      if (/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)) {
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+  
+    })()
+  </script><script>const GLOBAL_CONFIG = {
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  highlight: {"plugin":"highlight.js","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false,"highlightFullpage":false,"highlightMacStyle":false},
+  copy: {
+    success: '複製成功',
+    error: '複製失敗',
+    noSupport: '瀏覽器不支援'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  dateSuffix: {
+    just: '剛剛',
+    min: '分鐘前',
+    hour: '小時前',
+    day: '天前',
+    month: '個月前'
+  },
+  copyright: undefined,
+  lightbox: 'null',
+  Snackbar: undefined,
+  infinitegrid: {
+    js: 'https://cdn.jsdelivr.net/npm/@egjs/infinitegrid/dist/infinitegrid.min.js',
+    buttonText: '載入更多'
+  },
+  isPhotoFigcaption: false,
+  islazyloadPlugin: false,
+  isAnchor: false,
+  percent: {
+    toc: true,
+    rightside: false,
+  },
+  autoDarkmode: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Hyperledger Fabric 入門',
+  isHighlightShrink: false,
+  isToc: true,
+  pageType: 'post'
+}</script><meta name="generator" content="Hexo 7.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img text-center"><img src="/img/joey.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="site-data text-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">2</div></a></div><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-secret"></i><span> About</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="post-bg" id="page-header"><nav id="nav"><span id="blog-info"><a class="nav-site-title" href="/"><span class="site-name">J03Y's blog</span></a><a class="nav-page-title" href="/"><span class="site-name">Hyperledger Fabric 入門</span><span class="site-name"><i class="fa-solid fa-circle-arrow-left"></i><span>  返回首頁</span></span></a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> Archives</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> Tags</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> Categories</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user-secret"></i><span> About</span></a></div></div><div id="toggle-menu"><span class="site-page"><i class="fas fa-bars fa-fw"></i></span></div></div></nav><div id="post-info"><h1 class="post-title">Hyperledger Fabric 入門</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="fa-fw post-meta-icon far fa-calendar-alt"></i><span class="post-meta-label">發表於</span><time datetime="2025-06-25T08:56:49.000Z" title="發表於 2025-06-25 16:56:49">2025-06-25</time></span><span class="post-meta-categories"><span class="post-meta-separator">|</span><i class="fas fa-inbox fa-fw post-meta-icon"></i><a class="post-meta-categories" href="/categories/%E5%8D%80%E5%A1%8A%E9%8F%88/">區塊鏈</a></span></div><div class="meta-secondline"><span class="post-meta-separator">|</span><span class="post-meta-pv-cv" id="" data-flag-title=""><i class="far fa-eye fa-fw post-meta-icon"></i><span class="post-meta-label">瀏覽量:</span><span id="busuanzi_value_page_pv"><i class="fa-solid fa-spinner fa-spin"></i></span></span></div></div></div></header><main class="layout" id="content-inner"><div id="post"><article class="container post-content" id="article-container"><h1 id="Hyperledger-Fabric-（官方-Sample-範例）"><a href="#Hyperledger-Fabric-（官方-Sample-範例）" class="headerlink" title="Hyperledger Fabric （官方 Sample 範例）"></a>Hyperledger Fabric （官方 Sample 範例）</h1><h2 id="一、-Hyperledger-Fabric"><a href="#一、-Hyperledger-Fabric" class="headerlink" title="一、 Hyperledger Fabric"></a>一、 Hyperledger Fabric</h2><p>Hyperledger Fabric 是 Linux Foundation 推出的企業級區塊鏈框架，適合用於企業間的聯盟鏈（Permissioned Blockchain）。<br>它具有模組化設計、支持多通道、多組織、以及智能合約（Chaincode）功能。</p>
+<ul>
+<li><strong>Peer</strong>：節點，負責執行智慧合約及維護賬本。</li>
+<li><strong>Orderer</strong>：排序節點，負責交易排序與區塊打包。</li>
+<li><strong>Chaincode</strong>：智能合約，執行商業邏輯。</li>
+<li><strong>Channel</strong>：通道，不同組織間隔離的私有區塊鏈網路。</li>
+<li><strong>MSP</strong>：會員服務提供者，管理身份驗證。</li>
+</ul>
+<hr>
+<h2 id="二、環境準備"><a href="#二、環境準備" class="headerlink" title="二、環境準備"></a>二、環境準備</h2><h3 id="1-安裝必要工具"><a href="#1-安裝必要工具" class="headerlink" title="1. 安裝必要工具"></a>1. 安裝必要工具</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">sudo</span> apt update &amp;&amp; <span class="built_in">sudo</span> apt install -y git curl docker.io docker-compose jq</span><br></pre></td></tr></table></figure>
+
+<p>確保 Docker 與 Docker Compose 已安裝，且服務已啟動。</p>
+<h3 id="2-下載-Fabric-範例與工具"><a href="#2-下載-Fabric-範例與工具" class="headerlink" title="2. 下載 Fabric 範例與工具"></a>2. 下載 Fabric 範例與工具</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">curl -sSL https://bit.ly/2ysbOFE | bash -s</span><br></pre></td></tr></table></figure>
+
+<p>此指令會下載 <code>fabric-samples</code> 目錄、Fabric 二進位工具與映像檔。<br><strong>此指令會自動拉取 Docker images，不用另外載</strong><br>載下來的 fabric-samples 只要留這三個資料夾：</p>
+<ol>
+<li>bin:裡面是 peer, orderer, configtxgen, fabric-ca-client 等 binary 工具</li>
+<li>config:裡面是 core.yaml, orderer.yaml 的預設設定檔，可作為參考</li>
+<li>test-network: 官方簡易網路架構，可以參考其 docker-compose 與設定邏輯</li>
+</ol>
+<hr>
+<h2 id="三、啟動測試網路"><a href="#三、啟動測試網路" class="headerlink" title="三、啟動測試網路"></a>三、啟動測試網路</h2><h3 id="1-進入測試網路目錄"><a href="#1-進入測試網路目錄" class="headerlink" title="1. 進入測試網路目錄"></a>1. 進入測試網路目錄</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cd</span> fabric-samples/test-network</span><br></pre></td></tr></table></figure>
+
+<h3 id="2-啟動網路並建立通道"><a href="#2-啟動網路並建立通道" class="headerlink" title="2. 啟動網路並建立通道"></a>2. 啟動網路並建立通道</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh up createChannel -c mychannel -ca</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>up</code>：啟動 peer、orderer、CA 容器。</li>
+<li><code>createChannel</code>：建立通道。</li>
+<li><code>-c mychannel</code>：通道名稱為 <code>mychannel</code>。</li>
+<li><code>-ca</code>：使用 Fabric CA 產生憑證。</li>
+</ul>
+<h3 id="3-確認容器狀態"><a href="#3-確認容器狀態" class="headerlink" title="3. 確認容器狀態"></a>3. 確認容器狀態</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">docker ps</span><br></pre></td></tr></table></figure>
+
+<p>你會看到 <code>peer0.org1.example.com</code>、<code>peer0.org2.example.com</code>、<code>orderer.example.com</code>、<code>ca_org1</code>、<code>ca_org2</code> 等容器運行中。</p>
+<hr>
+<h2 id="四、部署-Sample-Chaincode：asset-transfer-basic"><a href="#四、部署-Sample-Chaincode：asset-transfer-basic" class="headerlink" title="四、部署 Sample Chaincode：asset-transfer-basic"></a>四、部署 Sample Chaincode：asset-transfer-basic</h2><p>官方 Sample 中的 <code>asset-transfer-basic</code> 是用 Node.js 或 Go 寫成的範例智慧合約，管理簡單資產。</p>
+<h3 id="1-部署-Chaincode"><a href="#1-部署-Chaincode" class="headerlink" title="1. 部署 Chaincode"></a>1. 部署 Chaincode</h3><p>執行以下指令部署官方 sample chaincode：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./network.sh deployCC -ccn basic -ccp ../asset-transfer-basic/chaincode-go -ccl go</span><br></pre></td></tr></table></figure>
+
+<ul>
+<li><code>-ccn basic</code>：合約名稱為 <code>basic</code></li>
+<li><code>-ccp</code>：chaincode 檔案路徑</li>
+<li><code>-ccl go</code>：使用 Go 語言撰寫</li>
+</ul>
+<h3 id="2-部署成功會顯示相關安裝、核准、提交訊息。"><a href="#2-部署成功會顯示相關安裝、核准、提交訊息。" class="headerlink" title="2. 部署成功會顯示相關安裝、核准、提交訊息。"></a>2. 部署成功會顯示相關安裝、核准、提交訊息。</h3><hr>
+<h2 id="五、設定環境變數，呼叫合約"><a href="#五、設定環境變數，呼叫合約" class="headerlink" title="五、設定環境變數，呼叫合約"></a>五、設定環境變數，呼叫合約</h2><h3 id="1-設定-Org1-Peer-環境變數"><a href="#1-設定-Org1-Peer-環境變數" class="headerlink" title="1. 設定 Org1 Peer 環境變數"></a>1. 設定 Org1 Peer 環境變數</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">export</span> CORE_PEER_TLS_ENABLED=<span class="literal">true</span></span><br><span class="line"><span class="built_in">export</span> CORE_PEER_LOCALMSPID=<span class="string">&quot;Org1MSP&quot;</span></span><br><span class="line"><span class="built_in">export</span> CORE_PEER_TLS_ROOTCERT_FILE=<span class="variable">$PWD</span>/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</span><br><span class="line"><span class="built_in">export</span> CORE_PEER_MSPCONFIGPATH=<span class="variable">$PWD</span>/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</span><br><span class="line"><span class="built_in">export</span> CORE_PEER_ADDRESS=localhost:7051</span><br></pre></td></tr></table></figure>
+
+<p>當你在使用 Hyperledger Fabric 的 sample 網路（例如 <code>fabric-samples/test-network</code>）時，需要設定這些環境變數來告訴 <code>peer</code> CLI：<strong>你是誰（用誰的身份）在呼叫哪一個 Peer</strong>。以下是詳細說明：</p>
+<p><code>export CORE_PEER_TLS_ENABLED=true</code></p>
+<ul>
+<li><strong>作用</strong>：啟用 TLS（Transport Layer Security）加密通訊。</li>
+<li><strong>為什麼重要？</strong>：Fabric 節點預設會使用 TLS 保護通訊安全（例如 peer 和 orderer 間的連線），這個變數要設成 <code>true</code> 才能正確建立 TLS 連線。</li>
+</ul>
+<hr>
+<p><code>export CORE_PEER_LOCALMSPID=&quot;Org1MSP&quot;</code></p>
+<ul>
+<li><strong>作用</strong>：指定當前 peer 所屬的組織的 MSP ID。</li>
+<li><strong><code>Org1MSP</code> 是什麼？</strong>：在 <code>configtx.yaml</code> 和證書目錄裡，這是 Org1 的身份標誌。所有憑證都會標記 <code>OU=Org1MSP</code>。</li>
+<li><strong>用途</strong>：peer CLI 執行交易時會依據這個變數決定使用哪一個組織的憑證。</li>
+</ul>
+<hr>
+<p><code>export CORE_PEER_TLS_ROOTCERT_FILE=$PWD/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt</code></p>
+<ul>
+<li><strong>作用</strong>：指定 Peer 的 TLS 根憑證（CA 憑證），用來驗證連線對象的身份。</li>
+<li><strong>用途</strong>：確保在連接 peer 時是連到真正的合法節點，而不是遭竄改的節點（防中間人攻擊）。</li>
+</ul>
+<hr>
+<p><code>export CORE_PEER_MSPCONFIGPATH=$PWD/organizations/peerOrganizations/org1.example.com/users/Admin@org1.example.com/msp</code></p>
+<ul>
+<li><p><strong>作用</strong>：指定執行指令的「使用者身份」。</p>
+</li>
+<li><p><strong>這裡是 Admin 的身份</strong>，所以這個 CLI 操作是以 Org1 的 Admin 角色發出指令。</p>
+</li>
+<li><p><strong>用途</strong>：</p>
+<ul>
+<li>當你用 <code>peer chaincode invoke</code>、<code>peer lifecycle chaincode approveformyorg</code> 時，這個 Admin 身份會對交易簽章。</li>
+<li>沒有 Admin 權限的身份就不能安裝或同意部署合約。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<p><code>export CORE_PEER_ADDRESS=localhost:7051</code></p>
+<ul>
+<li><p><strong>作用</strong>：指定要連線的 Peer 節點地址。</p>
+</li>
+<li><p><strong>7051 是 peer0.org1 的 gRPC 端口</strong>，你執行 chaincode 操作時會將交易請求送到這個節點上。</p>
+</li>
+<li><p><strong>用途</strong>：</p>
+<ul>
+<li>指定 peer CLI 命令要作用於哪一個 Peer 節點。</li>
+<li>例如 <code>peer chaincode query</code> 就會送給這個 Peer 執行查詢。</li>
+</ul>
+</li>
+</ul>
+<hr>
+<table>
+<thead>
+<tr>
+<th>變數</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td><code>CORE_PEER_TLS_ENABLED</code></td>
+<td>是否啟用 TLS 加密</td>
+</tr>
+<tr>
+<td><code>CORE_PEER_LOCALMSPID</code></td>
+<td>當前節點所屬 MSP ID</td>
+</tr>
+<tr>
+<td><code>CORE_PEER_TLS_ROOTCERT_FILE</code></td>
+<td>TLS 憑證的根憑證位置</td>
+</tr>
+<tr>
+<td><code>CORE_PEER_MSPCONFIGPATH</code></td>
+<td>執行 CLI 操作時的使用者身份</td>
+</tr>
+<tr>
+<td><code>CORE_PEER_ADDRESS</code></td>
+<td>要連線的 Peer 節點地址</td>
+</tr>
+</tbody></table>
+<hr>
+<p>每次使用 peer CLI 前（或重新開機後）都需要先設定這些變數，否則會找不到身份或連不到節點。可以寫成 <code>setOrg1Env.sh</code> 這樣的 shell 檔快速載入。</p>
+<h3 id="2-呼叫-Chaincode-新增資產"><a href="#2-呼叫-Chaincode-新增資產" class="headerlink" title="2. 呼叫 Chaincode 新增資產"></a>2. 呼叫 Chaincode 新增資產</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode invoke -o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls --cafile <span class="string">&quot;<span class="variable">$PWD</span>/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem&quot;</span> \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles <span class="variable">$PWD</span>/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">-C mychannel -n basic \</span><br><span class="line">-c <span class="string">&#x27;&#123;&quot;function&quot;:&quot;CreateAsset&quot;,&quot;Args&quot;:[&quot;asset6&quot;, &quot;yellow&quot;, &quot;5&quot;, &quot;Tom&quot;, &quot;1300&quot;]&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<ul>
+<li>這條指令會呼叫 <code>basic</code> 合約裡的 <code>CreateAsset</code> 函式，建立一個 ID 為 <code>asset6</code>，顏色為 <code>yellow</code>、擁有者為 <code>Tom</code> 等資產。</li>
+</ul>
+<h3 id="3-查詢資產"><a href="#3-查詢資產" class="headerlink" title="3. 查詢資產"></a>3. 查詢資產</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode query -C mychannel -n basic -c <span class="string">&#x27;&#123;&quot;Args&quot;:[&quot;ReadAsset&quot;,&quot;asset6&quot;]&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<p>會回傳資產詳細資料。</p>
+<hr>
+<h2 id="六、背書政策說明"><a href="#六、背書政策說明" class="headerlink" title="六、背書政策說明"></a>六、背書政策說明</h2><h3 id="1-背書政策定義"><a href="#1-背書政策定義" class="headerlink" title="1. 背書政策定義"></a>1. 背書政策定義</h3><p>背書政策（Endorsement Policy）決定哪些組織的 Peer 需要對交易背書（簽署），以確保交易有效且信任。</p>
+<ul>
+<li><p>預設 Sample 如 <code>asset-transfer-basic</code> 的背書政策通常是：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">OR(&#x27;Org1MSP.member&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>表示只要 Org1MSP 其中一台 Peer 背書即有效。</p>
+</li>
+</ul>
+<h3 id="2-多組織背書政策"><a href="#2-多組織背書政策" class="headerlink" title="2. 多組織背書政策"></a>2. 多組織背書政策</h3><p>若設定為：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">AND(&#x27;Org1MSP.member&#x27;, &#x27;Org2MSP.member&#x27;)</span><br></pre></td></tr></table></figure>
+
+<p>表示交易必須同時經 Org1 和 Org2 的 Peer 背書才有效。</p>
+<h3 id="3-呼叫時指定多-Peer-範例（符合多組織背書）"><a href="#3-呼叫時指定多-Peer-範例（符合多組織背書）" class="headerlink" title="3. 呼叫時指定多 Peer 範例（符合多組織背書）"></a>3. 呼叫時指定多 Peer 範例（符合多組織背書）</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">peer chaincode invoke -o localhost:7050 \</span><br><span class="line">--ordererTLSHostnameOverride orderer.example.com \</span><br><span class="line">--tls --cafile <span class="string">&quot;<span class="variable">$PWD</span>/organizations/ordererOrganizations/example.com/orderers/orderer.example.com/msp/tlscacerts/tlsca.example.com-cert.pem&quot;</span> \</span><br><span class="line">--peerAddresses localhost:7051 \</span><br><span class="line">--tlsRootCertFiles <span class="variable">$PWD</span>/organizations/peerOrganizations/org1.example.com/peers/peer0.org1.example.com/tls/ca.crt \</span><br><span class="line">--peerAddresses localhost:9051 \</span><br><span class="line">--tlsRootCertFiles <span class="variable">$PWD</span>/organizations/peerOrganizations/org2.example.com/peers/peer0.org2.example.com/tls/ca.crt \</span><br><span class="line">-C mychannel -n basic \</span><br><span class="line">-c <span class="string">&#x27;&#123;&quot;function&quot;:&quot;CreateAsset&quot;,&quot;Args&quot;:[&quot;asset7&quot;, &quot;blue&quot;, &quot;10&quot;, &quot;Jerry&quot;, &quot;500&quot;]&#125;&#x27;</span></span><br></pre></td></tr></table></figure>
+
+<hr>
+<h2 id="七、常見問題與排查"><a href="#七、常見問題與排查" class="headerlink" title="七、常見問題與排查"></a>七、常見問題與排查</h2><ul>
+<li><p><strong>交易 invoke 成功但 query 找不到資料？</strong><br>可能 invoke 尚未被區塊確認，或背書政策未滿足，造成交易無效。</p>
+</li>
+<li><p><strong>背書政策錯誤</strong><br>查看 peer log 會有 <code>ENDORSEMENT_POLICY_FAILURE</code>，確認 invoke 是否指定所有必要 peer。</p>
+</li>
+<li><p><strong>重新部署 Chaincode</strong><br>修改 chaincode 後需更新版本並重新部署。</p>
+</li>
+</ul>
+<hr>
+<h2 id="八、補充說明名詞"><a href="#八、補充說明名詞" class="headerlink" title="八、補充說明名詞"></a>八、補充說明名詞</h2><table>
+<thead>
+<tr>
+<th>名詞</th>
+<th>說明</th>
+</tr>
+</thead>
+<tbody><tr>
+<td>Peer</td>
+<td>區塊鏈節點，執行合約和賬本狀態維護</td>
+</tr>
+<tr>
+<td>Orderer</td>
+<td>負責交易排序與打包成區塊</td>
+</tr>
+<tr>
+<td>Chaincode</td>
+<td>智慧合約，定義交易邏輯</td>
+</tr>
+<tr>
+<td>Channel</td>
+<td>通道，隔離不同組織的交易數據</td>
+</tr>
+<tr>
+<td>MSP</td>
+<td>會員服務提供者，身份管理機制</td>
+</tr>
+<tr>
+<td>背書政策</td>
+<td>決定哪些 Peer 必須簽署交易，確保可信</td>
+</tr>
+</tbody></table>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta"><i class="fas fa-circle-user fa-fw"></i>文章作者: </span><span class="post-copyright-info"><a href="http://Youjia0706.github.io">J03Y</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta"><i class="fas fa-square-arrow-up-right fa-fw"></i>文章連結: </span><span class="post-copyright-info"><a href="http://youjia0706.github.io/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/">http://youjia0706.github.io/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta"><i class="fas fa-circle-exclamation fa-fw"></i>版權聲明: </span><span class="post-copyright-info">本部落格所有文章除特別聲明外，均採用<a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 授權協議。轉載請註明來源 <a href="http://Youjia0706.github.io" target="_blank">J03Y's blog</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E5%8D%80%E5%A1%8A%E9%8F%88/">區塊鏈</a><a class="post-meta__tags" href="/tags/Hyperledger-Fabric/">Hyperledger Fabric</a><a class="post-meta__tags" href="/tags/%E6%8A%80%E8%A1%93%E7%AD%86%E8%A8%98/">技術筆記</a></div><div class="post-share"><div class="social-share" data-image="/img/joey.png" data-sites="facebook,twitter,wechat,weibo,qq"></div><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/css/share.min.css" media="print" onload="this.media='all'"><script src="https://cdn.jsdelivr.net/npm/butterfly-extsrc/sharejs/dist/js/social-share.min.js" defer></script></div></div><nav class="pagination-post" id="pagination"><a class="pagination-related" href="/2025/06/26/Hyperledger_test-network%E6%AA%94%E6%A1%88%E8%AA%AA%E6%98%8E/" title="Hyperledger test-network 檔案說明"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info"><div class="info-1"><div class="info-item-1">上一篇</div><div class="info-item-2">Hyperledger test-network 檔案說明</div></div><div class="info-2"><div class="info-item-1">從環境建置到智能合約部署，操作 Hyperledger Fabric 官方 Sample 範例，並紀錄常用指令</div></div></div></a><a class="pagination-related" href="/2024/05/14/ReverseTools/" title="Reverse tools cheatsheet"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-right"><div class="info-1"><div class="info-item-1">下一篇</div><div class="info-item-2">Reverse tools cheatsheet</div></div><div class="info-2"><div class="info-item-1">常用逆向工程工具（IDA、GDB、x64dbg、WinDbg）指令與快捷鍵整理</div></div></div></a></nav><div class="relatedPosts"><div class="headline"><i class="fas fa-thumbs-up fa-fw"></i><span>相關推薦</span></div><div class="relatedPosts-list"><a class="pagination-related" href="/2025/06/26/Hyperledger_test-network%E6%AA%94%E6%A1%88%E8%AA%AA%E6%98%8E/" title="Hyperledger test-network 檔案說明"><div class="cover" style="background: var(--default-bg-color)"></div><div class="info text-center"><div class="info-1"><div class="info-item-1"><i class="far fa-calendar-alt fa-fw"></i> 2025-06-26</div><div class="info-item-2">Hyperledger test-network 檔案說明</div></div><div class="info-2"><div class="info-item-1">從環境建置到智能合約部署，操作 Hyperledger Fabric 官方 Sample 範例，並紀錄常用指令</div></div></div></a></div></div></div><div class="aside-content" id="aside-content"><div class="card-widget card-info text-center"><div class="avatar-img"><img src="/img/joey.png" onerror="this.onerror=null;this.src='/img/friend_404.gif'" alt="avatar"/></div><div class="author-info-name">J03Y</div><div class="author-info-description">這都是可以討論的</div><div class="site-data"><a href="/archives/"><div class="headline">文章</div><div class="length-num">5</div></a><a href="/tags/"><div class="headline">標籤</div><div class="length-num">4</div></a><a href="/categories/"><div class="headline">分類</div><div class="length-num">2</div></a></div><a id="card-info-btn" target="_blank" rel="noopener" href="https://github.com/Youjia0706"><i class="fab fa-github"></i><span>Follow Me</span></a><div class="card-info-social-icons"><a class="social-icon" href="https://github.com/Youjia0706" target="_blank" title="Github"><i class="fab fa-github" style="color: #24292e;"></i></a><a class="social-icon" href="/m11309302@mail.ntust.edu.tw" target="_blank" title="Email"><i class="fas fa-envelope" style="color: #4a7dbe;"></i></a><a class="social-icon" href="https://www.instagram.com/jiayou_0706/" target="_blank" title="Instagram"><i class="fab fa-instagram" style="color: #E1306C;"></i></a><a class="social-icon" href="https://www.youtube.com/watch?v=dQw4w9WgXcQ" target="_blank" title="YouTube"><i class="fab fa-youtube" style="color: #FF0000;"></i></a></div></div><div class="card-widget card-announcement"><div class="item-headline"><i class="fas fa-bullhorn fa-shake"></i><span>公告</span></div><div class="announcement_content">這都是可以討論的</div></div><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目錄</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-1"><a class="toc-link" href="#Hyperledger-Fabric-%EF%BC%88%E5%AE%98%E6%96%B9-Sample-%E7%AF%84%E4%BE%8B%EF%BC%89"><span class="toc-number">1.</span> <span class="toc-text">Hyperledger Fabric （官方 Sample 範例）</span></a><ol class="toc-child"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%80%E3%80%81-Hyperledger-Fabric"><span class="toc-number">1.1.</span> <span class="toc-text">一、 Hyperledger Fabric</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%8C%E3%80%81%E7%92%B0%E5%A2%83%E6%BA%96%E5%82%99"><span class="toc-number">1.2.</span> <span class="toc-text">二、環境準備</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E5%AE%89%E8%A3%9D%E5%BF%85%E8%A6%81%E5%B7%A5%E5%85%B7"><span class="toc-number">1.2.1.</span> <span class="toc-text">1. 安裝必要工具</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E4%B8%8B%E8%BC%89-Fabric-%E7%AF%84%E4%BE%8B%E8%88%87%E5%B7%A5%E5%85%B7"><span class="toc-number">1.2.2.</span> <span class="toc-text">2. 下載 Fabric 範例與工具</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%89%E3%80%81%E5%95%9F%E5%8B%95%E6%B8%AC%E8%A9%A6%E7%B6%B2%E8%B7%AF"><span class="toc-number">1.3.</span> <span class="toc-text">三、啟動測試網路</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%80%B2%E5%85%A5%E6%B8%AC%E8%A9%A6%E7%B6%B2%E8%B7%AF%E7%9B%AE%E9%8C%84"><span class="toc-number">1.3.1.</span> <span class="toc-text">1. 進入測試網路目錄</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%95%9F%E5%8B%95%E7%B6%B2%E8%B7%AF%E4%B8%A6%E5%BB%BA%E7%AB%8B%E9%80%9A%E9%81%93"><span class="toc-number">1.3.2.</span> <span class="toc-text">2. 啟動網路並建立通道</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E7%A2%BA%E8%AA%8D%E5%AE%B9%E5%99%A8%E7%8B%80%E6%85%8B"><span class="toc-number">1.3.3.</span> <span class="toc-text">3. 確認容器狀態</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%9B%9B%E3%80%81%E9%83%A8%E7%BD%B2-Sample-Chaincode%EF%BC%9Aasset-transfer-basic"><span class="toc-number">1.4.</span> <span class="toc-text">四、部署 Sample Chaincode：asset-transfer-basic</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E9%83%A8%E7%BD%B2-Chaincode"><span class="toc-number">1.4.1.</span> <span class="toc-text">1. 部署 Chaincode</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E9%83%A8%E7%BD%B2%E6%88%90%E5%8A%9F%E6%9C%83%E9%A1%AF%E7%A4%BA%E7%9B%B8%E9%97%9C%E5%AE%89%E8%A3%9D%E3%80%81%E6%A0%B8%E5%87%86%E3%80%81%E6%8F%90%E4%BA%A4%E8%A8%8A%E6%81%AF%E3%80%82"><span class="toc-number">1.4.2.</span> <span class="toc-text">2. 部署成功會顯示相關安裝、核准、提交訊息。</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%BA%94%E3%80%81%E8%A8%AD%E5%AE%9A%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8%EF%BC%8C%E5%91%BC%E5%8F%AB%E5%90%88%E7%B4%84"><span class="toc-number">1.5.</span> <span class="toc-text">五、設定環境變數，呼叫合約</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%A8%AD%E5%AE%9A-Org1-Peer-%E7%92%B0%E5%A2%83%E8%AE%8A%E6%95%B8"><span class="toc-number">1.5.1.</span> <span class="toc-text">1. 設定 Org1 Peer 環境變數</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%91%BC%E5%8F%AB-Chaincode-%E6%96%B0%E5%A2%9E%E8%B3%87%E7%94%A2"><span class="toc-number">1.5.2.</span> <span class="toc-text">2. 呼叫 Chaincode 新增資產</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E6%9F%A5%E8%A9%A2%E8%B3%87%E7%94%A2"><span class="toc-number">1.5.3.</span> <span class="toc-text">3. 查詢資產</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AD%E3%80%81%E8%83%8C%E6%9B%B8%E6%94%BF%E7%AD%96%E8%AA%AA%E6%98%8E"><span class="toc-number">1.6.</span> <span class="toc-text">六、背書政策說明</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#1-%E8%83%8C%E6%9B%B8%E6%94%BF%E7%AD%96%E5%AE%9A%E7%BE%A9"><span class="toc-number">1.6.1.</span> <span class="toc-text">1. 背書政策定義</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#2-%E5%A4%9A%E7%B5%84%E7%B9%94%E8%83%8C%E6%9B%B8%E6%94%BF%E7%AD%96"><span class="toc-number">1.6.2.</span> <span class="toc-text">2. 多組織背書政策</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#3-%E5%91%BC%E5%8F%AB%E6%99%82%E6%8C%87%E5%AE%9A%E5%A4%9A-Peer-%E7%AF%84%E4%BE%8B%EF%BC%88%E7%AC%A6%E5%90%88%E5%A4%9A%E7%B5%84%E7%B9%94%E8%83%8C%E6%9B%B8%EF%BC%89"><span class="toc-number">1.6.3.</span> <span class="toc-text">3. 呼叫時指定多 Peer 範例（符合多組織背書）</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E4%B8%83%E3%80%81%E5%B8%B8%E8%A6%8B%E5%95%8F%E9%A1%8C%E8%88%87%E6%8E%92%E6%9F%A5"><span class="toc-number">1.7.</span> <span class="toc-text">七、常見問題與排查</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%85%AB%E3%80%81%E8%A3%9C%E5%85%85%E8%AA%AA%E6%98%8E%E5%90%8D%E8%A9%9E"><span class="toc-number">1.8.</span> <span class="toc-text">八、補充說明名詞</span></a></li></ol></li></ol></div></div><div class="card-widget card-recent-post"><div class="item-headline"><i class="fas fa-history"></i><span>最新文章</span></div><div class="aside-list"><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/08/07/uvCommand/" title="uv &amp; pip 指令對照表">uv &amp; pip 指令對照表</a><time datetime="2025-08-07T12:00:00.000Z" title="發表於 2025-08-07 20:00:00">2025-08-07</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/06/26/Hyperledger_test-network%E6%AA%94%E6%A1%88%E8%AA%AA%E6%98%8E/" title="Hyperledger test-network 檔案說明">Hyperledger test-network 檔案說明</a><time datetime="2025-06-26T07:00:00.000Z" title="發表於 2025-06-26 15:00:00">2025-06-26</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2025/06/25/Hyperledger_Fabric%E5%85%A5%E9%96%80/" title="Hyperledger Fabric 入門">Hyperledger Fabric 入門</a><time datetime="2025-06-25T08:56:49.000Z" title="發表於 2025-06-25 16:56:49">2025-06-25</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/05/14/ReverseTools/" title="Reverse tools cheatsheet">Reverse tools cheatsheet</a><time datetime="2024-05-14T12:00:00.000Z" title="發表於 2024-05-14 20:00:00">2024-05-14</time></div></div><div class="aside-list-item no-cover"><div class="content"><a class="title" href="/2024/05/13/Git/" title="Git 常用指令">Git 常用指令</a><time datetime="2024-05-13T12:00:00.000Z" title="發表於 2024-05-13 20:00:00">2024-05-13</time></div></div></div></div></div></div></main><footer id="footer"><div class="footer-other"><div class="footer-copyright"><span class="copyright">&copy;&nbsp;2025 By J03Y</span><span class="framework-info"><span>框架 </span><a target="_blank" rel="noopener" href="https://hexo.io">Hexo 7.3.0</a><span class="footer-separator">|</span><span>主題 </span><a target="_blank" rel="noopener" href="https://github.com/jerryc127/hexo-theme-butterfly">Butterfly 5.4.3</a></span></div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="閱讀模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="日夜模式切換"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="單欄和雙欄切換"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside-config" type="button" title="設定"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目錄"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到頂端"><span class="scroll-percent"></span><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><div class="js-pjax"></div><script async data-pjax src="//busuanzi.ibruce.info/busuanzi/2.3/busuanzi.pure.mini.js"></script></div></body></html>
